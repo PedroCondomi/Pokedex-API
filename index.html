@@ -5,16 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pokédex - PokeAPI</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="poke.js" defer></script>
-    <script src="search.js" defer></script>
+    <script src="poke.js" defer type="module"></script>
+    <script src="search.js" defer type="module"></script>
+    <script src="helper.js" defer type="module"></script>
   </head>
   <body>
     <main class="main">
       <header class="header home">
         <div class="container">
-          <div class="logo-wrapper">
-            <img src="./assets/pokeball.svg" alt="pokeball" />
-            <h1>Pokedex</h1>
+          <div class="header-wrapper">
+            <div class="logo-wrapper">
+              <img src="./assets/pokeball.svg" alt="pokeball" />
+              <h1>Pokedex</h1>
+            </div>
+            <div class="darkmode-wrapper" id="darkmode-btn">
+              <img
+                src="./assets/darkmode.svg"
+                alt="search icon"
+                class="search-icon"
+                id="darkmode-img"
+              />
+            </div>
+            <div class="flags-wrapper">
+              <div class="language-flags">
+                <img src="./assets/spanishlang.svg" class="flag" id="spanish" />
+              </div>
+              <div class="language-flags">
+                <img src="./assets/englishlang.png" class="flag" id="english" />
+              </div>
+            </div>
           </div>
           <div class="search-wrapper">
             <div class="search-wrap">
@@ -46,7 +65,7 @@
                 />
               </div>
               <div class="filter-wrapper">
-                <p class="body2-fonts">Sort by:</p>
+                <p class="body2-fonts" id="sorter">Sort by:</p>
                 <div class="filter-wrap">
                   <div>
                     <input
@@ -55,7 +74,9 @@
                       id="number"
                       value="number"
                     />
-                    <label for="number" class="body3-fonts">Number</label>
+                    <label for="number" class="body3-fonts" id="number-label"
+                      >Number</label
+                    >
                   </div>
                   <div>
                     <input
@@ -65,7 +86,9 @@
                       value="name"
                       checked
                     />
-                    <label for="name" class="body3-fonts">Name</label>
+                    <label for="name" class="body3-fonts" id="name-label"
+                      >Name</label
+                    >
                   </div>
                 </div>
               </div>

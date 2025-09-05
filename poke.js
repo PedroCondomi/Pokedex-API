@@ -1,10 +1,25 @@
-const MAX_POKEMON = 649;
+import {
+  colorModeIndex,
+  toggleColorMode,
+  setLanguageIndex,
+  getLanguage,
+} from "./helper.js";
+
+const MAX_POKEMON = 1025;
 const closeButton = document.querySelector("#search-close-icon");
 const listWrapper = document.querySelector(".list-wrapper");
 const nameFilter = document.querySelector("#name");
 const notFoundMessage = document.querySelector("#not-found-message");
 const numberFilter = document.querySelector("#number");
 const searchInput = document.querySelector("#search-input");
+const langEs = document.querySelector("#spanish");
+const langEn = document.querySelector("#english");
+const darkmodeBtn = document.querySelector("#darkmode-btn");
+
+document.addEventListener("DOMContentLoaded", () => {
+  setLanguageIndex();
+  colorModeIndex();
+});
 
 // store all pokemons
 let allPokemons = [];
@@ -15,6 +30,24 @@ fetch(`https://pokeapi.co/api/v2/pokemon?limit=${MAX_POKEMON}`)
     allPokemons = data.results;
     displayPokemon(allPokemons);
   });
+
+langEs.addEventListener("click", () => {
+  if (getLanguage() !== "es") {
+    localStorage.setItem("language", "es");
+    setLanguageIndex();
+  }
+});
+
+langEn.addEventListener("click", () => {
+  if (getLanguage() !== "en") {
+    localStorage.setItem("language", "en");
+    setLanguageIndex();
+  }
+});
+
+darkmodeBtn.addEventListener("click", () => {
+  toggleColorMode();
+});
 
 const fetchPokemonDataBeforeRedirect = async id => {
   try {
@@ -42,10 +75,10 @@ const displayPokemon = pokemon => {
         <p class="caption-fonts">#${pokemonID}</p>
     </div>
     <div class="img-wrap">
-        <img src="https://raw.githubusercontent.com/pokeapi/sprites/master/sprites/pokemon/other/dream-world/${pokemonID}.svg" alt="${pokemon.name}"/>
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/refs/heads/master/sprites/pokemon/other/official-artwork/${pokemonID}.png" alt="${pokemon.name}"/>
     </div>
     <div class="name-wrap">
-        <p class="body3-fonts">#${pokemon.name}</p>
+        <p class="body3-fonts">${pokemon.name}</p>
     </div>
     `;
 

@@ -1,17 +1,49 @@
+import {
+  typeColors,
+  colorModeDetails,
+  setLanguageDetails,
+  statNameMapping,
+} from "./helper.js";
 let currentPokemonId = null;
+const MAX_POKEMONS = 1025;
+
+const getLanguage = () => {
+  return localStorage.getItem("language") || "en";
+};
 
 document.addEventListener("DOMContentLoaded", () => {
-  const MAX_POKEMONS = 649;
+  getLanguage();
+  setLanguageDetails();
+  colorModeDetails();
   const pokemonID = new URLSearchParams(window.location.search).get("id");
   const id = parseInt(pokemonID, 10);
 
-  // TODO Change to wrap around pokemons instead of ret to homepage
   if (id < 1 || id > MAX_POKEMONS) {
     return (window.location.href = "./index.html");
   }
 
   currentPokemonId = id;
   loadPokemon(id);
+
+  const [leftArrow, rightArrow] = ["#leftArrow", "#rightArrow"].map(sel =>
+    document.querySelector(sel)
+  );
+
+  leftArrow.addEventListener("click", () => {
+    let prevId = currentPokemonId - 1;
+    if (prevId < 1) {
+      prevId = MAX_POKEMONS;
+    }
+    navigatePokemon(prevId);
+  });
+
+  rightArrow.addEventListener("click", () => {
+    let nextId = currentPokemonId + 1;
+    if (nextId > MAX_POKEMONS) {
+      nextId = 1;
+    }
+    navigatePokemon(nextId);
+  });
 });
 
 const loadPokemon = async id => {
@@ -32,22 +64,6 @@ const loadPokemon = async id => {
       const flavorText = getEnglishFlavorText(pokemonSpecies);
       document.querySelector(".body3-fonts.pokemon-description").textContent =
         flavorText;
-      const [leftArrow, rightArrow] = ["#leftArrow", "#rightArrow"].map(sel =>
-        document.querySelector(sel)
-      );
-      leftArrow.removeEventListener("click", navigatePokemon);
-      rightArrow.removeEventListener("click", navigatePokemon);
-
-      if (id !== 1) {
-        leftArrow.addEventListener("click", () => {
-          navigatePokemon(id - 1);
-        });
-      }
-      if (id !== 649) {
-        rightArrow.addEventListener("click", () => {
-          navigatePokemon(id + 1);
-        });
-      }
 
       window.history.pushState({}, "", `./detail.html?id=${id}`);
     }
@@ -62,27 +78,6 @@ const loadPokemon = async id => {
 const navigatePokemon = async id => {
   currentPokemonId = id;
   await loadPokemon(id);
-};
-
-const typeColors = {
-  normal: "#A8A878",
-  fire: "#F08030",
-  water: "#6890F0",
-  electric: "#F8D030",
-  grass: "#78C850",
-  ice: "#98D8D8",
-  fighting: "#C03028",
-  poison: "#A040A0",
-  ground: "#E0C068",
-  flying: "#A890F0",
-  psychic: "#F85888",
-  bug: "#A8B820",
-  rock: "#B8A038",
-  ghost: "#705898",
-  dragon: "#7038F8",
-  dark: "#705848",
-  steel: "#B8B8D0",
-  fairy: "#EE99AC",
 };
 
 const setElementStyle = (elements, cssProperty, value) => {
@@ -154,9 +149,47 @@ const createAndAppendElement = (parent, tag, options = {}) => {
   return element;
 };
 
-const displayPokemonDetails = pokemon => {
-  const { name, id, types, weight, height, abilities, stats } = pokemon;
+const getLocalizedName = (data, language) => {
+  const nameEntry = data.names.find(entry => entry.language.name === language);
+  return nameEntry ? nameEntry.name : data.name;
+};
 
+const getMovesAndTypes = async pokemon => {
+  const { abilities, types } = pokemon;
+  const language = getLanguage();
+  const abilitiesNames = [];
+  const typesNames = [];
+
+  for (const { ability } of abilities) {
+    try {
+      const res = await fetch(ability.url);
+      const abilityData = await res.json();
+      const localizedName = getLocalizedName(abilityData, language);
+      abilitiesNames.push(localizedName);
+    } catch (err) {
+      console.error("Failed to fetch ability: ", err);
+    }
+  }
+  for (const { type } of types) {
+    try {
+      const res = await fetch(type.url);
+      const typeData = await res.json();
+      const localizedName = getLocalizedName(typeData, language);
+      typesNames.push(localizedName);
+    } catch (err) {
+      console.error("Failed to fetch type: ", err);
+    }
+  }
+  return { abilitiesNames, typesNames };
+};
+
+const displayPokemonDetails = async pokemon => {
+  const { name, id, weight, height, stats } = pokemon;
+  const { typesNames, abilitiesNames } = await getMovesAndTypes(pokemon);
+
+  const language = setLanguageDetails();
+
+  // Pokemon name
   const capitalizedName = capitalizeFirstLetter(name);
   document.querySelector("title").textContent = capitalizedName;
 
@@ -169,18 +202,21 @@ const displayPokemonDetails = pokemon => {
 
   // Pokemon img
   const imageElement = document.querySelector(".detail-img-wrapper img");
-  imageElement.src = `https://raw.githubusercontent.com/pokeapi/sprites/master/sprites/pokemon/other/dream-world/${id}.svg`;
+  imageElement.src = `https://raw.githubusercontent.com/PokeAPI/sprites/refs/heads/master/sprites/pokemon/other/official-artwork/${id}.png`;
   imageElement.alt = name;
 
+  // Pokemon types
   const typeWrapper = document.querySelector(".power-wrapper");
   typeWrapper.innerHTML = "";
-  types.forEach(({ type }) => {
+
+  typesNames.forEach(type => {
     createAndAppendElement(typeWrapper, "p", {
-      className: `body3-fonts type ${type.name}`,
-      textContent: type.name,
+      className: `body3-fonts type ${type}`,
+      textContent: type,
     });
   });
 
+  // Weight, height and moves
   document.querySelector(
     ".pokemon-detail-wrap .pokemon-detail p.body3-fonts.weight"
   ).textContent = `${weight / 10} kg`;
@@ -191,24 +227,18 @@ const displayPokemonDetails = pokemon => {
   const abilitiesWrapper = document.querySelector(
     ".pokemon-detail-wrap .pokemon-detail.move"
   );
-  abilities.forEach(({ ability }) => {
+
+  abilitiesNames.forEach(ability => {
     createAndAppendElement(abilitiesWrapper, "p", {
       className: "body3-fonts",
-      textContent: ability.name,
+      textContent: ability,
     });
   });
 
   // Pokemon stats
   const statsWrapper = document.querySelector(".stats-wrapper");
   statsWrapper.innerHTML = "";
-  const statNameMapping = {
-    hp: "HP",
-    attack: "ATK",
-    defense: "DEF",
-    "special-attack": "SATK",
-    "special-defense": "SDEF",
-    speed: "SPD",
-  };
+
   stats.forEach(({ stat, base_stat }) => {
     const statDiv = document.createElement("div");
     statDiv.className = "stats-wrap";
@@ -235,7 +265,7 @@ const displayPokemonDetails = pokemon => {
 const getEnglishFlavorText = pokemonSpecies => {
   // TODO Crear version en español
   for (let entry of pokemonSpecies.flavor_text_entries) {
-    if (entry.language.name === "en") {
+    if (entry.language.name === getLanguage()) {
       let flavor = entry.flavor_text.replace(/\f/g, "");
       return flavor;
     }

@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pokémon Detail</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="./poke-detail.js" defer></script>
+    <script src="./poke-detail.js" defer type="module"></script>
+    <script src="./helper.js" defer type="module"></script>
   </head>
   <body>
     <main class="detail-main main">
       <header class="header">
-        <div class="header-wrapper">
+        <div class="header-wrapper" id="poke-header">
           <div class="header-wrap">
             <a href="./index.html" class="back-btn-wrap">
               <img
@@ -45,47 +46,52 @@
           <p class="body3-fonts type grass"></p>
           <p class="body3-fonts type poison"></p>
         </div>
-        <p class="body2-fonts about-text">About</p>
+        <p class="body2-fonts about-text" id="about"></p>
         <div class="pokemon-detail-wrapper">
           <div class="pokemon-detail-wrap">
             <div class="pokemon-detail">
-              <img src="./assets/weight.svg" alt="weight" />
+              <img src="./assets/weight.svg" id="weightIcon" alt="weight" />
               <p class="body3-fonts weight"></p>
             </div>
-            <p class="caption-fonts">Weight</p>
+            <p class="caption-fonts" id="weight"></p>
           </div>
           <div class="pokemon-detail-wrap">
             <div class="pokemon-detail">
-              <img src="./assets/height.svg" alt="height" class="straighten" />
+              <img
+                src="./assets/height.svg"
+                id="heightIcon"
+                alt="height"
+                class="straighten"
+              />
               <p class="body3-fonts height"></p>
             </div>
-            <p class="caption-fonts">Height</p>
+            <p class="caption-fonts" id="height"></p>
           </div>
           <div class="pokemon-detail-wrap">
             <div class="pokemon-detail move"></div>
-            <p class="caption-fonts">Move</p>
+            <p class="caption-fonts" id="move"></p>
           </div>
         </div>
         <p class="body3-fonts pokemon-description"></p>
-        <p class="body2-fonts about-text">Base Stats</p>
+        <p class="body2-fonts about-text" id="base-stats"></p>
         <div class="stats-wrapper">
           <div class="stats-wrap" data-stat="HP">
-            <p class="body3-fonts stats">HP</p>
+            <p class="body3-fonts stats" id="hp"></p>
             <p class="body3-fonts"></p>
             <progress value="" max="100" class="progress-bar"></progress>
           </div>
           <div class="stats-wrap" data-stat="ATK">
-            <p class="body3-fonts stats">ATK</p>
+            <p class="body3-fonts stats" id="atk"></p>
             <p class="body3-fonts"></p>
             <progress value="" max="100" class="progress-bar"></progress>
           </div>
           <div class="stats-wrap" data-stat="DEF">
-            <p class="body3-fonts stats">DEF</p>
+            <p class="body3-fonts stats" id="def"></p>
             <p class="body3-fonts"></p>
             <progress value="" max="100" class="progress-bar"></progress>
           </div>
           <div class="stats-wrap" data-stat="SATK">
-            <p class="body3-fonts stats">SATK</p>
+            <p class="body3-fonts stats" id="satk"></p>
             <p class="body3-fonts"></p>
             <progress value="" max="100" class="progress-bar"></progress>
           </div>
